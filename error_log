@@ -1,0 +1,3 @@
+[10-Mar-2021 15:16:05 Asia/Kolkata] PHP Fatal error:  Cannot use App\RateChart as RateChart because the name is already in use in /home/truck/public_html/app/Http/Controllers/RateChartController.php on line 8
+[21-Aug-2021 14:41:01 Asia/Kolkata] PHP Fatal error:  Cannot use [] for reading in /home/truck/public_html/app/Http/Controllers/BillingController.php on line 81
+[21-Aug-2021 14:41:39 Asia/Kolkata] PHP Fatal error:  Cannot use [] for reading in /home/truck/public_html/app/Http/Controllers/BillingController.php on line 81

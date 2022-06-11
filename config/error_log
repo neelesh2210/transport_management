@@ -1,0 +1,8 @@
+[17-Feb-2022 13:42:35 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/shivatransport/public_html/config/app.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/shivatransport/public_html/config/app.php on line 16
+[17-Feb-2022 13:42:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/shivatransport/public_html/config/app.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/shivatransport/public_html/config/app.php on line 16
