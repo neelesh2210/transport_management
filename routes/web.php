@@ -18,31 +18,45 @@ Route::get('/', function () {
 Route::get('/fcft','User@fcft');
 //Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 
-Route::resource('/company','CompanyController');
-Route::post('/update_status','CompanyController@update_status');
-Route::post('/material_store','CompanyController@material_store');
+//Company
+Route::resource('/company','CompanyController')->except(['destroy']);
+Route::get('company-delete/{id}','CompanyController@destroy')->name('company.destroy');
+Route::get('/update_status/{id}/{status}','CompanyController@update_status')->name('update.status');
+
+//Branch
+Route::resource('branch','BranchController')->except(['destroy']);
+Route::get('branch-delete/{id}','BranchController@destroy')->name('branch.destroy');
+Route::get('update-branch-status/{id}/{status}','BranchController@update_status')->name('update.branch.status');
+Route::post('/material_store','CompanyController@material_store')->name('material.store');
+Route::post('get-branch','CompanyController@getBranch')->name('get.branch');
 
 Route::resource('/emplyoee','EmplyoeeController');
-Route::post('/update_status_emplyoee','EmplyoeeController@update_status');
+Route::get('update-status-emplyoee/{id}/{status}','EmplyoeeController@update_status')->name('update.status.emplyoee');
 
 Route::get('get_emplyoee/{id}', 'EmplyoeeController@get_emplyoee')->name('get_emplyoee');
 
 Route::resource('/emplyoee_profile','EmplyoeeprofileController');
 Route::post('/get_emp_details','EmplyoeeprofileController@get_emp_details');
 
-Route::resource('/petrol_pump','PetrolPumpController');
-Route::post('/update_status_petrol','PetrolPumpController@update_status_petrol');
+//Petrol Pump
+Route::resource('/petrol_pump','PetrolPumpController')->except(['destroy']);
+Route::get('petrol-pump-delete/{id}','PetrolPumpController@destroy')->name('petrol.pump.destroy');
+Route::get('/update_status_petrol/{id}/{status}','PetrolPumpController@update_status_petrol')->name('update.status.petrol');
 
-Route::resource('/vechile_owner','VechileOwnerController');
-Route::post('/update_status','VechileOwnerController@update_status');
+//Vechile Owner
+Route::resource('/vechile_owner','VechileOwnerController')->except(['destroy']);
+Route::get('vechile-owner-delete/{id}','VechileOwnerController@destroy')->name('vechile.owner.destroy');
+Route::get('update-status-vechile-owner/{id}/{status}','VechileOwnerController@updateStatusVechileOwner')->name('update.status.vechile.owner');
 Route::get('/OwnerDetail','VechileOwnerController@OwnerDetail');
 
 Route::resource('/truck','TruckController');
 Route::post('/update_status','TruckController@update_status');
 Route::get('/TruckDetail','TruckController@TruckDetail');
 
-Route::resource('/driver','DriverController');
-Route::post('/update_status','DriverController@update_status');
+//Driver
+Route::resource('/driver','DriverController')->except(['destroy']);
+Route::get('update-status-driver/{id}/{status}','DriverController@update_status')->name('update.status.driver');
+Route::get('driver-delete/{id}','DriverController@destroy')->name('driver.destroy');
 Route::get('/DriverDetail','DriverController@DriverDetail');
 
 Route::resource('/staff','StaffController');

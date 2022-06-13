@@ -2,137 +2,121 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\PetrolPump;
-use App\Companie;
-use App\Http\Controllers\Controller;
 use DB;
-use Spatie\Permission\Models\Permission;
+use App\Companie;
+use App\PetrolPump;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission;
 
 class PetrolPumpController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    function __construct() {
+
+    function __construct()
+    {
 		$this->middleware('permission:petrol-pump-list|petrol-pump-create|petrol-pump-edit|petrol-pump-delete', ['only' => ['index', 'store']]);
 		$this->middleware('permission:petrol-pump-create', ['only' => ['create', 'store']]);
 		$this->middleware('permission:petrol-pump-edit', ['only' => ['edit', 'update']]);
 		$this->middleware('permission:petrol-pump-delete', ['only' => ['destroy']]);
 	}
 
-    public function index()
+    public function index(Request $request)
     {
-        $data=PetrolPump::orderBy('branch')->get();
-        $comp=Companie::all(); 
-        return view('petrolpump.viewpetrolpump',['page_name'=>"Petrol Pump List",'data'=>$data, 'comp'=>$comp, 'checked'=>'checked','unchecked'=>'']);
+        $list=PetrolPump::where('delete_status',0)->orderBy('petrolpump_name');
+
+        $key=$request->key;
+        $branches=$request->branch_id;
+        if(!empty($branches))
+        {
+            $list=$list->whereIn('branch',$branches);
+        }
+        if(!empty($key))
+        {
+            $list=$list->whereJsonContains('petrolpump_mobile_no',$key);
+        }
+
+        $list=$list->paginate(10);
+
+        return view('petrolpump.index',['page_name'=>"Petrol Pump List",'list'=>$list,'key'=>$key,'branches'=>$branches]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-          $comp=Companie::all(); 
-          return view('petrolpump.petrolpump',['page_name'=>'Petrol Pump Registration', 'comp'=>$comp]);
+        $comp=Companie::all();
+        return view('petrolpump.create',['page_name'=>'Petrol Pump Registration', 'comp'=>$comp]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-          
-         $input = $request->all();
-        
-         PetrolPump::create($input);
+        $petrol_pump=new PetrolPump;
 
-         $request->session()->flash('data','Data Inserted Successfully!');
+        $petrol_pump->petrolpump_name=$request->petrolpump_name;
+        $petrol_pump->petrolpump_address=$request->petrolpump_address;
+        $petrol_pump->petrolpump_mobile_no=$request->petrolpump_mobile_no;
+        $petrol_pump->branch=$request->branch;
+        $petrol_pump->amount=$request->amount;
+        $petrol_pump->amount_type=$request->amount_type;
+        $petrol_pump->start_range=$request->start_range;
+        $petrol_pump->end_range=$request->end_range;
+        $petrol_pump->add_by=Auth::user()->id;
 
-         return redirect('petrol_pump');
+        $petrol_pump->save();
+
+        return redirect()->route('petrol_pump.index')->with('success','Petrol Pump Registered Successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        $petrolpump=PetrolPump::find($id);
-        $comp=Companie::all();
-      return view('petrolpump.petrolpump',['page_name'=>'Petrol Pump Registration', 'comp'=>$comp, 'edit_data'=>$petrolpump]);
+        $data=PetrolPump::find($id);
+
+        return view('petrolpump.edit',['page_name'=>'Petrol Pump Registration', 'data'=>$data]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-         
-        $input = $request->all();
-    
-         PetrolPump::find($id)-> update($input);
-       
-        $request->session()->flash('data','Data Updated Successfully!');
-         return redirect('petrol_pump');
+
+        $petrol_pump=PetrolPump::find($id);
+
+        $petrol_pump->petrolpump_name=$request->petrolpump_name;
+        $petrol_pump->petrolpump_address=$request->petrolpump_address;
+        $petrol_pump->petrolpump_mobile_no=$request->petrolpump_mobile_no;
+        $petrol_pump->branch=$request->branch;
+        $petrol_pump->amount=$request->amount;
+        $petrol_pump->amount_type=$request->amount_type;
+        $petrol_pump->start_range=$request->start_range;
+        $petrol_pump->end_range=$request->end_range;
+        $petrol_pump->add_by=Auth::user()->id;
+
+        $petrol_pump->save();
+
+        return redirect()->route('petrol_pump.index')->with('success','Petrol Pump Updated Successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Request $request,$id)
     {
-    //     if($id=='bulk_delete'){
-    //         $request->validate([
-    // 	"bulk_delete"=>"required"]);
-       
-    //         $input = $request->all();
-    //         $ids=$input['bulk_delete'];
-    //         Companie::destroy($ids);
-    //         $request->session()->flash('data','Data Deleted Successfully!');
-    //         return redirect('company');
-         
-    //     }
-    //     else{
-         PetrolPump::find($id)-> delete();
-         $request->session()->flash('data','Data Deleted Successfully!');
-         return redirect('petrol_pump');
-        // }
-    }
-    
-    public function update_status_petrol(Request $request){
- 
-        PetrolPump::where('id',$request->c_id)->update(['status'=>$request->stat]);
-        $status=PetrolPump::find($request->c_id);
-        return response()->json(array('msg'=>$status), 200);
+        PetrolPump::find($id)->update(['delete_status'=>1]);
 
+        return redirect()->route('petrol_pump.index')->with('error','Petrol Pump Delete Successfully!');
+    }
+
+    public function update_status_petrol($id,$status)
+    {
+        PetrolPump::where('id',$id)->update(['status'=>$status]);
+
+        if($status == 0)
+        {
+            return redirect()->route('petrol_pump.index')->with('error','Petrol Pump Inactive Successfully!');
+        }
+        else
+        {
+            return redirect()->route('petrol_pump.index')->with('success','Petrol Pump Active Successfully!');
+        }
     }
 }

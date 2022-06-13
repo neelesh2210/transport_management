@@ -2,23 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Companie;
-use App\Http\Controllers\Controller;
 use DB;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use App\Branch;
+use App\Companie;
 use App\Material;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission;
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
-    function __construct() {
+    function __construct()
+    {
 		$this->middleware('permission:companies-list|companies-create|companies-edit|companies-delete', ['only' => ['index', 'store']]);
 		$this->middleware('permission:companies-create', ['only' => ['create', 'store']]);
 		$this->middleware('permission:companies-edit', ['only' => ['edit', 'update']]);
@@ -27,143 +25,131 @@ class CompanyController extends Controller
 
     public function index()
     {
-       $data=Companie::all();
-       return view('company.viewcompany',['page_name'=>"Company List",'data'=>$data,'checked'=>'checked','unchecked'=>'']);
+        $list=Companie::where('delete_status',0)->orderBy('company_name','asc');
+
+        $key=request()->key;
+        if(!empty($key))
+        {
+            $list=$list->where(function ($query) use ($key){
+                $query->where('company_name', 'like', '%'.$key.'%')
+                      ->orWhere('company_code', 'like', '%'.$key.'%')->orWhere('company_gstin', 'like', '%'.$key.'%');
+            });
+        }
+
+        $list=$list->paginate(10);
+
+        $page_name='Company Registration';
+        return view('company.index',compact('list','page_name','key'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-         return view('company.company',['page_name'=>'Company Registration']);
+        return view('company.create',['page_name'=>'Company Registration']);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        
-       
-        
-         $fileName='select.png';    
-         if($request->file('company_logo')){
-         $file=$request->file('company_logo');
-         $fileName=$request->company_code.'_'.$file->getClientOriginalName();
-         $fileName=str_replace(" ","_",$fileName);
-         $file->move('images',$fileName);
-          }
-         $input = $request->all();
-         $input['company_logo'] = $fileName;
-         Companie::create($input);
+        $this->validate($request, [
+			'company_name' => 'required',
+			'company_code' => 'required|string|unique:companies,company_code',
+			'company_address' => 'required',
+		]);
 
-         $request->session()->flash('data','Data Inserted Successfully!');
+        $company=new Companie;
 
-         return redirect('company');
-        
+        $company->company_name=$request->company_name;
+        $company->company_code=$request->company_code;
+        if($request->file('company_logo'))
+        {
+            $company_logo=$request->file('company_logo');
+            $company_logo_name = time().rand(1, 100).".".$company_logo->getClientOriginalExtension();
+            $company_logo->move(public_path('company_logos'), $company_logo_name);
+            $company->company_logo = $company_logo_name;
+        }
+        $company->company_address=$request->company_address;
+        $company->company_gstin=$request->company_gstin;
+        $company->add_by=Auth::user()->id;
+
+        $company->save();
+
+        return redirect()->route('company.index')->with('success','Company Added Successfully!');
+
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-      $company=Companie::find($id);
-      return view('company.company',['page_name'=>'Company Registration','data'=>$company]);
+        $data=Companie::find($id);
+        return view('company.edit',['page_name'=>'Company Registration','data'=>$data]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
-    {    
-
-
-        
-        if($request->file('company_logo')){
-         $file=$request->file('company_logo');
-         $fileName=$request->company_code.'_'.$file->getClientOriginalName();
-         $fileName=str_replace(" ","_",$fileName);
-         $file->move('images',$fileName);
-         }
-        $input = $request->all();
-        if(!empty($fileName)){
-        $input['company_logo'] = $fileName;
-          }
-        // $company= Companie::find($id);
-         Companie::find($id)-> update($input);
-        //$company->fill($input)->save();
-        $request->session()->flash('data','Data Updated Successfully!');
-         return redirect('company');
-      
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Request $request,$id)
     {
-        if($id=='bulk_delete'){
-            $request->validate([
-    	"bulk_delete"=>"required"]);
-       
-            $input = $request->all();
-            $ids=$input['bulk_delete'];
-            Companie::destroy($ids);
-            $request->session()->flash('data','Data Deleted Successfully!');
-            return redirect('company');
-         
+        $this->validate($request, [
+			'company_name' => 'required',
+			'company_code' => 'required|string|unique:companies,company_code,'.$id,
+			'company_address' => 'required',
+		]);
+
+        $company=Companie::find($id);
+
+        $company->company_name=$request->company_name;
+        $company->company_code=$request->company_code;
+        $company->company_code=$request->company_code;
+        if($request->file('company_logo'))
+        {
+            $company_logo=$request->file('company_logo');
+            $company_logo_name = time().rand(1, 100).".".$company_logo->getClientOriginalExtension();
+            $company_logo->move(public_path('company_logos'), $company_logo_name);
+            $company->company_logo = $company_logo_name;
         }
-        else{
-         Companie::find($id)-> delete();
-         $request->session()->flash('data','Data Deleted Successfully!');
-         return redirect('company');
+        $company->company_address=$request->company_address;
+        $company->company_gstin=$request->company_gstin;
+        $company->add_by=Auth::user()->id;
+        $company->save();
+
+        return redirect()->route('company.index')->with('success','Company Updated Successfully!');
+
+    }
+
+    public function destroy($id)
+    {
+        Companie::where('id',$id)->update(['delete_status'=>1]);
+
+        return redirect()->route('company.index')->with('error','Company Delete Successfully!');
+    }
+
+    public function update_status($id,$status)
+    {
+        Companie::where('id',$id)->update(['status'=>$status]);
+
+        if($status == 0)
+        {
+            return redirect()->route('company.index')->with('error','Company Inactive Successfully!');
         }
+        else
+        {
+            return redirect()->route('company.index')->with('success','Company Active Successfully!');
+        }
+    }
+
+    public function material_store(Request $request)
+    {
+        $material=new Material;
+        $material->name=$request->material;
+        $material->save();
+
+        return Material::where('delete_status',0)->where('status',1)->orderBy('name','asc')->get();
 
     }
 
-    public function update_status(Request $request){
- 
-     Companie::where('id',$request->c_id)->update(['status'=>$request->stat]);
-     $status=Companie::find($request->c_id);
-     return response()->json(array('msg'=>$status), 200);
-
+    public function getBranch(Request $request)
+    {
+        return Branch::where('delete_status',0)->where('status',1)->where('company_id',$request->company_id)->get();
     }
-    
-     public function material_store(Request $request){
- 
-       $material=new Material;
-       $material->name=$request->material;
-       $material->save();
-        return response()->json(array('msg'=>'1'), 200);
 
-    }
-    
 }

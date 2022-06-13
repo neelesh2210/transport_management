@@ -20,7 +20,7 @@ class EmplyoeeprofileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    
+
 
      function __construct() {
           $this->middleware('permission:employee-profile-list|employee-profile-create|employee-profile-edit|employee-profile-delete', ['only' => ['index', 'store']]);
@@ -31,8 +31,8 @@ class EmplyoeeprofileController extends Controller
 
     public function index()
     {
-        $data=Emplyoeeprofile::all();
-        return view('emplyoee.viewemplyoeeprofile',['page_name'=>"Emplyoee Profile List",'data'=>$data,'checked'=>'checked','unchecked'=>'']);
+        $list=Emplyoeelog::paginate(10);
+        return view('emplyoee.index',['page_name'=>"Emplyoee List",'list'=>$list,'checked'=>'checked','unchecked'=>'']);
     }
 
     /**
@@ -43,7 +43,7 @@ class EmplyoeeprofileController extends Controller
     public function create()
     {
         $user= Emplyoeelog::all();
-        return view('emplyoee.emplyoee_profile',['page_name'=>'Emplyoee Profile Registration','emp_id'=>$user]);
+        return view('emplyoee.profile',['page_name'=>'Emplyoee Profile Registration','emp_id'=>$user]);
     }
 
     /**
@@ -64,13 +64,13 @@ class EmplyoeeprofileController extends Controller
         $input = $request->all();
         $input['emplyoee_photo'] = $fileName;
         Emplyoeeprofile::create($input);
-        
+
         $user = User::where('email', $request->emplyoee_email)->first();
         $user->name = $request->emplyoee_name;
         $user->save();
-        
+
         $request->session()->flash('data','Data Inserted Successfully!');
-        
+
         return redirect('emplyoee_profile');
     }
 
@@ -82,10 +82,10 @@ class EmplyoeeprofileController extends Controller
      */
     public function show($id)
     {
-        
+
          $data=Emplyoeeprofile::find($id);
-         return response()->json(['success' => 'Success','data'=>$data], $this-> successStatus); 
-       
+         return response()->json(['success' => 'Success','data'=>$data], $this-> successStatus);
+
     }
 
     /**
@@ -121,13 +121,13 @@ class EmplyoeeprofileController extends Controller
             $input['emplyoee_photo'] = $fileName;
         }
         Emplyoeeprofile::find($id)->update($input);
-          
+
         $user = User::where('email', $request->emplyoee_email)->first();
         $user->name = $request->emplyoee_name;
         $user->save();
 
          if($request->sp=='ajax'){
-             
+
               $status=Emplyoeeprofile::find($id);
               return response()->json(array('msg'=>$status), 200);
           }
@@ -149,7 +149,7 @@ class EmplyoeeprofileController extends Controller
        $request->session()->flash('data','Data Deleted Successfully!');
        return redirect('emplyoee_profile');
     }
-    
+
     public function get_emp_details(Request $request)
     {
          $employee_id=$request->emp_id;
