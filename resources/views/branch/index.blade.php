@@ -43,7 +43,7 @@
                                             </select>
                                         </div>
                                         <div class="col-md-2" style="padding: 0px;">
-                                            <input type="text" name="key" class="form-control float-right" value="{{$key}}" placeholder="Search">
+                                            <input type="text" name="key" class="form-control float-right" value="{{$search}}" placeholder="Search">
                                         </div>
                                         <div class="col-md-1" style="padding: 0px;">
                                             <button type="submit" class="btn btn-default" style="height: 37px;">
@@ -111,7 +111,7 @@
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-center">
-                            {!! $list->links() !!}
+                            {!! $list->appends(['key'=>$search, 'company_id'=>$companies, 'material_id'=>$materials])->links() !!}
                         </div>
                     </div>
                 </div>

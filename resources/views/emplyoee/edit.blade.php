@@ -21,10 +21,11 @@
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Register Employee</h3>
+                            <h3 class="card-title">Edit Employee</h3>
                         </div>
-                            <form role="form" method="POST" action="{{route('emplyoee.store')}}" enctype="multipart/form-data" class="valid_form">
-                                @csrf
+                        <form role="form" method="POST" action="{{route('emplyoee.update', $data->id)}}" enctype="multipart/form-data" class="valid_form">
+                            @method('PUT')
+                            @csrf
                             <div class="card-body">
                                 <div class="row">
                                     <div class="form-group col-md-4">
@@ -63,28 +64,22 @@
                                     <div class="form-group col-md-4">
                                         <div class="form-group">
                                             <label for="emplyoee_id">Emplyoee Email ID<span class="red">*</span></label>
-                                            <input type="email" name="emplyoee_id" class="form-control" id="emplyoee_id" value="{{$data->user->email}}" placeholder="Enter Name" required>
+                                            <input type="email" name="emplyoee_id" class="form-control" id="emplyoee_id" value="{{$data->user->email}}" placeholder="Enter Name" required readonly>
                                         </div>
                                     </div>
 
                                     <div class="form-group col-md-4">
                                         <div class="form-group">
-                                            <label for="emplyoee_password">Emplyoee Password<span class="red">*</span></label>
-                                            <input type="password" name="emplyoee_password" class="form-control" id="emplyoee_password" placeholder="Enter Name" required>
+                                            <label for="emplyoee_password">Emplyoee Password</label>
+                                            <input type="password" name="emplyoee_password" class="form-control" id="emplyoee_password" placeholder="Enter Name">
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="roles">Role<span class="red">*</span></label>
                                         @php
-                                             $selected_role = DB::table('model_has_roles')->where('model_id', $data->user_id)->pluck('role_id')->toArray();
+                                            $selected_role = $data->user->roles->pluck('name', 'name')->all();
                                         @endphp
-                                        <select name="roles[]" class="form-control select2" style="width: 100%;" required data-placeholder='Select Role'>
-                                            <option value="">Select Role</option>
-                                            @foreach ($roles as $role)
-                                                <option value="{{$role}}" @if(in_array($role,$selected_role)) selected @endif>{{$role}}</option>
-                                            @endforeach
-                                        </select>
-                                        {{-- {!! Form::select('roles[]', $roles,[], array('class' => 'form-control select2','multiple','data-placeholder'=>'Select Role','required')) !!} --}}
+                                        {!! Form::select('roles[]', $roles, $selected_role, array('class' => 'form-control select2','multiple','data-placeholder'=>'Select Role','required')) !!}
                                     </div>
                                 </div>
                             </div>

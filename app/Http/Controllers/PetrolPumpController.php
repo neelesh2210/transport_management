@@ -26,20 +26,20 @@ class PetrolPumpController extends Controller
     {
         $list=PetrolPump::where('delete_status',0)->orderBy('petrolpump_name');
 
-        $key=$request->key;
+        $search=$request->key;
         $branches=$request->branch_id;
         if(!empty($branches))
         {
             $list=$list->whereIn('branch',$branches);
         }
-        if(!empty($key))
+        if(!empty($search))
         {
-            $list=$list->whereJsonContains('petrolpump_mobile_no',$key);
+            $list=$list->whereJsonContains('petrolpump_mobile_no',$search);
         }
 
         $list=$list->paginate(10);
 
-        return view('petrolpump.index',['page_name'=>"Petrol Pump List",'list'=>$list,'key'=>$key,'branches'=>$branches]);
+        return view('petrolpump.index',['page_name'=>"Petrol Pump List",'list'=>$list,'search'=>$search,'branches'=>$branches]);
     }
 
     public function create()

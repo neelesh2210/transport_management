@@ -81,10 +81,31 @@ class EmplyoeeController extends Controller
 
     public function update(Request $request, $id)
     {
-        $input = $request->all();
-        Emplyoeelog::find($id)-> update($input);
-        $request->session()->flash('data','Data Updated Successfully!');
-        return redirect('emplyoee');
+        $emplyoee_log = Emplyoeelog::find($id);
+        $user = User::find($emplyoee_log->user_id);
+
+        $this->validate($request, [
+            'company_id'=>'required',
+            'branch_id'=>'required',
+            'emplyoee_type'=>'required',
+			'roles' => 'required',
+		]);
+
+        if($request->emplyoee_password != null){
+            $user->password = Hash::make($request->emplyoee_password);
+        }
+        $user->save();
+
+        DB::table('model_has_roles')->where('model_id', $user->id)->delete();
+
+		$user->assignRole($request->input('roles'));
+
+        $emplyoee_log->companies_id = $request->company_id;
+        $emplyoee_log->branch_id = $request->branch_id;
+        $emplyoee_log->emplyoee_type = $request->emplyoee_type;
+        $emplyoee_log->save();
+
+        return redirect()->route('emplyoee.index')->with('success','Employee Update Successfully!');
     }
 
     public function destroy(Request $request,$id)

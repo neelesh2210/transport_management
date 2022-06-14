@@ -27,19 +27,19 @@ class CompanyController extends Controller
     {
         $list=Companie::where('delete_status',0)->orderBy('company_name','asc');
 
-        $key=request()->key;
-        if(!empty($key))
+        $search=request()->key;
+        if(!empty($search))
         {
-            $list=$list->where(function ($query) use ($key){
-                $query->where('company_name', 'like', '%'.$key.'%')
-                      ->orWhere('company_code', 'like', '%'.$key.'%')->orWhere('company_gstin', 'like', '%'.$key.'%');
+            $list=$list->where(function ($query) use ($search){
+                $query->where('company_name', 'like', '%'.$search.'%')
+                      ->orWhere('company_code', 'like', '%'.$search.'%')->orWhere('company_gstin', 'like', '%'.$search.'%');
             });
         }
 
         $list=$list->paginate(10);
 
         $page_name='Company Registration';
-        return view('company.index',compact('list','page_name','key'));
+        return view('company.index',compact('list','page_name','search'));
     }
 
     public function create()

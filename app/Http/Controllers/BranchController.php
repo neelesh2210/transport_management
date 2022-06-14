@@ -21,7 +21,7 @@ class BranchController extends Controller
     {
         $list=Branch::where('delete_status',0)->orderBy('branch_name','asc');
 
-        $key=$request->key;
+        $search=$request->key;
         $company=$request->company_id;
         $materials=$request->material_id;
         if(!empty($company))
@@ -36,18 +36,18 @@ class BranchController extends Controller
                 }
             });
         }
-        if(!empty($key))
+        if(!empty($search))
         {
-            $list=$list->where(function ($query) use ($key)
+            $list=$list->where(function ($query) use ($search)
             {
-                $query->where('branch_name', 'like', '%'.$key.'%')
-                ->orWhere('branch_code', 'like', '%'.$key.'%');
+                $query->where('branch_name', 'like', '%'.$search.'%')
+                ->orWhere('branch_code', 'like', '%'.$search.'%');
             });
         }
 
         $list=$list->paginate(10);
 
-        return view('branch.index',['list'=>$list,'page_name'=>'Branch Registration','key'=>$key,'companies'=>$company,'materials'=>$materials]);
+        return view('branch.index',['list'=>$list,'page_name'=>'Branch Registration','search'=>$search,'companies'=>$company,'materials'=>$materials]);
     }
 
     public function create()

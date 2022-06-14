@@ -32,7 +32,7 @@ class EmplyoeeprofileController extends Controller
     public function index()
     {
         $list=Emplyoeelog::paginate(10);
-        return view('emplyoee.index',['page_name'=>"Emplyoee List",'list'=>$list,'checked'=>'checked','unchecked'=>'']);
+        return view('emplyoee_profile.index',['page_name'=>"Emplyoee List",'list'=>$list,'checked'=>'checked','unchecked'=>'']);
     }
 
     /**
@@ -82,9 +82,8 @@ class EmplyoeeprofileController extends Controller
      */
     public function show($id)
     {
-
-         $data=Emplyoeeprofile::find($id);
-         return response()->json(['success' => 'Success','data'=>$data], $this-> successStatus);
+        $data=Emplyoeeprofile::find($id);
+        return response()->json(['success' => 'Success','data'=>$data], $this-> successStatus);
 
     }
 
@@ -96,9 +95,9 @@ class EmplyoeeprofileController extends Controller
      */
     public function edit($id)
     {
-        $user= Emplyoeelog::all();
-        $emplyoee=Emplyoeeprofile::find($id);
-        return view('emplyoee.emplyoee_profile',['page_name'=>'Emplyoee Profile Edit','emp_id'=>$user,'edit_data'=>$emplyoee]);
+        $emplyoee=Emplyoeelog::find($id);
+        $emplyoee_profile = Emplyoeeprofile::where('emplyoee_id', $emplyoee->id)->first();
+        return view('emplyoee_profile.edit',['page_name'=>'Emplyoee Profile Edit', 'edit_data'=>$emplyoee, 'edit_emplyoee_profile'=>$emplyoee_profile]);
     }
 
     /**
@@ -120,6 +119,7 @@ class EmplyoeeprofileController extends Controller
         if(!empty($fileName)){
             $input['emplyoee_photo'] = $fileName;
         }
+        
         Emplyoeeprofile::find($id)->update($input);
 
         $user = User::where('email', $request->emplyoee_email)->first();

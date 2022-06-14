@@ -102,7 +102,7 @@
                                             @endif
                                         </td>
                                         <td class="center">
-                                            <a class="btn btn-app action-button" href="{{route('emplyoee.edit',$data->id)}}">
+                                            <a class="btn btn-app action-button" href="{{route('emplyoee_profile.edit',$data->id)}}">
                                                 <i class="fas fa-edit edit-color"></i>
                                             </a>
                                             {{-- <a class="btn btn-app action-button" onclick="return confirm('You want to delete?');" href="{{route('emplyoee.destroy',$data->id)}}">

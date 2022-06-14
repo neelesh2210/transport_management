@@ -20,7 +20,7 @@
                         <div class="card-tools">
                             <form action="{{route('company.index')}}">
                                 <div class="input-group input-group-sm" style="width: 150px;">
-                                    <input type="text" name="key" class="form-control float-right" value="{{$key}}" placeholder="Search">
+                                    <input type="text" name="key" class="form-control float-right" value="{{$search}}" placeholder="Search">
                                     <div class="input-group-append">
                                         <button type="submit" class="btn btn-default">
                                             <i class="fas fa-search"></i>
@@ -85,7 +85,7 @@
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-center">
-                            {!! $list->links() !!}
+                            {!! $list->appends(['key'=>$search])->links() !!}
                         </div>
                     </div>
                 </div>
