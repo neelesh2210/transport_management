@@ -101,7 +101,7 @@
                         @endcan
                     </ul>
                 </li>
-                {{-- <li class="nav-item has-treeview">
+                <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-chart-pie"></i>
                         <p>Management<i class="fas fa-angle-left right"></i><span class="badge badge-info right"></span></p>
@@ -201,7 +201,7 @@
                             </li>
                         </ul>
                     @endcan
-                </li> --}}
+                </li>
             </ul>
         </nav>
     </div>
