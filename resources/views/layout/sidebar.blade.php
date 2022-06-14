@@ -101,12 +101,12 @@
                         @endcan
                     </ul>
                 </li>
-                <li class="nav-item has-treeview">
+                <li class="nav-item @if(Route::currentRouteName() == 'loading_slip.index') menu-is-opening menu-open @endif">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-chart-pie"></i>
                         <p>Management<i class="fas fa-angle-left right"></i><span class="badge badge-info right"></span></p>
                     </a>
-                    @can('fuel-list')
+                    {{-- @can('fuel-list')
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('fuel.index') }}" class="nav-link">
@@ -115,18 +115,18 @@
                                 </a>
                             </li>
                         </ul>
-                    @endcan
+                    @endcan --}}
                     @can('loading-slip-list')
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('loading_slip.index') }}" class="nav-link">
+                                <a href="{{ route('loading_slip.index') }}" class="nav-link @if(Route::currentRouteName() == 'loading_slip.index') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Loading Slip</p>
                                 </a>
                             </li>
                         </ul>
                     @endcan
-                    @can('truck-place-list')
+                    {{-- @can('truck-place-list')
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('truck_placement.index') }}" class="nav-link">
@@ -135,8 +135,8 @@
                                 </a>
                             </li>
                         </ul>
-                    @endcan
-                    @can('invoice-list')
+                    @endcan --}}
+                    {{-- @can('invoice-list')
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('invoice.index') }}" class="nav-link">
@@ -165,18 +165,18 @@
                                 </a>
                             </li>
                         </ul>
-                    @endcan
+                    @endcan --}}
 
                 </li>
-                @can('billing-list')
+                {{-- @can('billing-list')
                     <li class="nav-item has-treeview">
                         <a href="{{ route('bill.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-money-bill-alt"></i>
                             <p>Billing</p>
                         </a>
                     </li>
-                @endcan
-                <li class="nav-item has-treeview">
+                @endcan --}}
+                {{-- <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>User Management<i class="fas fa-angle-left right"></i><span class="badge badge-info right"></span></p>
@@ -201,7 +201,7 @@
                             </li>
                         </ul>
                     @endcan
-                </li>
+                </li> --}}
             </ul>
         </nav>
     </div>
