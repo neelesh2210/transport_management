@@ -29,10 +29,43 @@ class EmplyoeeprofileController extends Controller
           $this->middleware('permission:employee-profile-delete', ['only' => ['destroy']]);
      }
 
-    public function index()
+    public function index(Request $request)
     {
-        $list=Emplyoeelog::paginate(10);
-        return view('emplyoee_profile.index',['page_name'=>"Emplyoee List",'list'=>$list,'checked'=>'checked','unchecked'=>'']);
+        $list=Emplyoeeprofile::orderBy('id','desc');
+
+        $search=$request->key;
+        $company=$request->company_id;
+        $branchs=$request->branch_id;
+        if(!empty($company))
+        {
+            return $list = $list->whereHas('emplyoee', function($query) use ($company){
+                $query->where('companies_id', $company);
+            })->get();
+        }
+
+        if(!empty($branchs))
+        {
+            $list=$list->where(function($query) use($branchs) {
+                foreach($branchs as $branch) {
+                    $query->orWhereRaw("find_in_set('".$branch."',branch_id)");
+                }
+            });
+        }
+
+        if(!empty($search))
+        {
+            $list=$list->where(function ($query) use ($search)
+            {
+                $query->where('emplyoee_name', 'like', '%'.$search.'%')
+                ->orWhere('emplyoee_email', 'like', '%'.$search.'%')
+                ->orWhere('emplyoee_cno', 'like', '%'.$search.'%');
+            });
+
+        }
+
+        $list = $list->paginate(10);
+
+        return view('emplyoee_profile.index',['page_name'=>"Emplyoee List",'list'=>$list,'search'=>$search, 'companies'=>$company,'branchs'=>$branchs]);
     }
 
     /**
@@ -119,7 +152,7 @@ class EmplyoeeprofileController extends Controller
         if(!empty($fileName)){
             $input['emplyoee_photo'] = $fileName;
         }
-        
+
         Emplyoeeprofile::find($id)->update($input);
 
         $user = User::where('email', $request->emplyoee_email)->first();

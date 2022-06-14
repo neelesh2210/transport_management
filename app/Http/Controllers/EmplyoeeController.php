@@ -24,10 +24,38 @@ class EmplyoeeController extends Controller
 		$this->middleware('permission:employee-delete', ['only' => ['destroy']]);
 	}
 
-    public function index()
+    public function index(Request $request)
     {
-        $list=Emplyoeelog::paginate(10);
-        return view('emplyoee.index',['page_name'=>"Emplyoee List",'list'=>$list,'checked'=>'checked','unchecked'=>'']);
+        $list=Emplyoeelog::orderBy('id','desc');
+
+        $search=$request->key;
+        $company=$request->company_id;
+        $branchs=$request->branch_id;
+        if(!empty($company))
+        {
+            $list=$list->whereIn('companies_id',$company);
+        }
+
+        if(!empty($branchs))
+        {
+            $list=$list->where(function($query) use($branchs) {
+                foreach($branchs as $branch) {
+                    $query->orWhereRaw("find_in_set('".$branch."',branch_id)");
+                }
+            });
+        }
+
+        if(!empty($search))
+        {
+            $list = $list->with(["user" => function($query) use ($search){
+                $query->where('name', '=', $search);
+            }]);
+
+        }
+
+        $list = $list->paginate(10);
+
+        return view('emplyoee.index',['page_name'=>"Emplyoee List",'list'=>$list, 'search'=>$search, 'companies'=>$company,'branchs'=>$branchs]);
     }
 
     public function create()

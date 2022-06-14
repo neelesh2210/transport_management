@@ -9,7 +9,7 @@
                     <div class="card-header">
                         <ol class="breadcrumb float-sm-left">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Employee Profile</li>
+                            <li class="breadcrumb-item active">Employee</li>
                         </ol>
                         @can('companies-create')
                             <a href="{{ route('emplyoee.create') }}" class="btn btn-primary btn-info "
@@ -31,25 +31,26 @@
                                                     data-placeholder="Select Company" id="company_id" multiple>
                                                     <option value="">Select Company...</option>
                                                     @foreach (\App\Companie::where('delete_status', 0)->where('status', 1)->orderBy('company_name', 'asc')->get() as $company)
-                                                        <option value="{{ $company->id }}">
+                                                        <option value="{{ $company->id }}"  @isset($companies)@if(in_array($company->id,$companies)) selected @endif @endisset>
                                                             {{ $company->company_name }}({{ $company->company_code }})
                                                         </option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="col-md-4">
-                                                <select name="material_id[]" id="material_id"
-                                                    data-placeholder="Select Material" class="form-control select2"
+                                                <select name="branch_id[]" id="branch_id"
+                                                    data-placeholder="Select Branch.." class="form-control select2"
                                                     multiple>
-                                                    <option value="">Select Material...</option>
-                                                    @foreach (\App\Material::where('delete_status', 0)->where('status', 1)->orderBy('name', 'asc')->get() as $material)
-                                                        <option value="{{ $material->id }}">{{ $material->name }}
+                                                    <option value="">Select Branch...</option>
+                                                    @foreach (\App\Branch::where('delete_status', 0)->where('status', 1)->orderBy('branch_name', 'asc')->get() as $branch)
+                                                        <option value="{{ $branch->id }}" @isset($branchs)@if(in_array($branch->id, $branchs)) selected @endif @endisset>
+                                                            {{ $branch->branch_name }} ({{$branch->branch_code}})
                                                         </option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="col-md-2" style="padding: 0px;">
-                                                <input type="text" name="key" class="form-control float-right" value="" placeholder="Search">
+                                                <input type="text" name="key" class="form-control float-right" value="{{$search}}" placeholder="Search">
                                             </div>
                                             <div class="col-md-1" style="padding: 0px;">
                                                 <button type="submit" class="btn btn-default" style="height: 37px;">
@@ -123,7 +124,7 @@
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-center">
-                            {!! $list->links() !!}
+                            {!! $list->appends(['key'=>$search, 'company_id'=>$companies, 'branch_id'=>$branchs])->links() !!}
                         </div>
                     </div>
                 </div>
